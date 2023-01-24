@@ -1,0 +1,23 @@
+df = df.assign(Text2 = df['Text'])                                               # Add new comparison column text
+
+df['Text2'] = df['Text'].replace(r'\n',' ', regex=True)                         # remove new line 
+df['Text2'] = df['Text2'].map(lambda x: re.sub(r'http\S+', ' ', x))              # remove url
+df['Text2'] = df['Text2'].map(lambda x: re.sub(r'#\S+', ' ', x))                 # remove hashtag
+df['Text2'] = df['Text2'].map(lambda x: re.sub(r'@\S+', ' ', x))                 # remove username
+df['Text2'] = df['Text2'].map(lambda x: re.sub("^\d+\s|\s\d+\s|\s\d+$", " ", x)) # remove any digit
+df['Text2'] = df['Text2'].map(lambda x: re.sub(r'\\S+', ' ', x))                # remove \u00a0 and the other similar code
+df['Text2'] = df['Text2'].map(lambda x: re.sub(r'[^A-Za-z0-9]+', ' ', x))        # remove special character including emoji
+df['Text2'] = df['Text2'].str.replace('RT','',case=True)                         # remove RT
+df['Text2'] = df['Text2'].str.lstrip()                                           # remove whitespace,newline,tab,basically everything from the start of string
+df['Text2'] = df['Text2'].str.rstrip()                                           # remove whitespace,newline,tab,basically everything from the end of string
+df['Text2'] = df['Text2'].str.lower()                                            # lowercase
+
+
+df = df.assign(Text3 = df['Text2'])                                              # Create new text for display normalized result
+df['Text3'] = df['Text2'].map(lambda x: normalize_fcn(x))                        # Normalize
+
+######################################
+#Remove Number
+######################################
+df = df.assign(RemoveNumber = df['Text3'])
+df['RemoveNumber'] = df['Text3'].map(lambda x: re.sub('[0-9]+', ' ', x) )         # remove Number
